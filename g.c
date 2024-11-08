@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define N 3602 // pocet bodov
+#define N 3602 // pocet meracich bodov
+#define M 32402 // pocet zdrojovych bodov
 #define TOL 1e-7
 
 // prevod jednotiek
@@ -51,6 +52,40 @@ void matrix_vector_mult(double **A, const double *vec, double *result)
     }
 }
 
+//A'*A
+void matrix_transpose_multiply(double **A, double **S)
+{
+    // Transponovanie matice A
+    double **A_T = (double **)malloc(N * sizeof(double *)); // vytvorenie matice pre transponovanú maticu
+    for (int i = 0; i < N; i++) {
+        A_T[i] = (double *)malloc(M * sizeof(double)); // každému riadku priraď nový stĺpec
+    }
+
+    // Vytvorenie transponovanej matice A^T
+    for (int i = 0; i < M; i++) {
+        for (int j = 0; j < N; j++) {
+            A_T[j][i] = A[i][j];  // Transponovanie: A[i][j] => A_T[j][i]
+        }
+    }
+
+    // Výpočet súčinu A^T * A (A_T * A)
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            S[i][j] = 0.0;
+            for (int k = 0; k < M; k++) {
+                S[i][j] += A_T[i][k] * A[k][j];  // Vypočíta súčin A_T * A
+            }
+        }
+    }
+
+    // Uvoľnenie pamäte pre A_T
+    for (int i = 0; i < N; i++) {
+        free(A_T[i]);
+    }
+    free(A_T);
+}
+
+
 int main()
 {
 
@@ -71,7 +106,7 @@ int main()
     double *f = (double *)malloc(N * sizeof(double));
 
     // MaticA A
-    double **A = (double **)malloc(N * sizeof(double *));
+    /*double **A = (double **)malloc(N * sizeof(double *));
     for (int i = 0; i < N; i++)
     {
         A[i] = (double *)malloc(N * sizeof(double));
@@ -80,9 +115,22 @@ int main()
     {
         printf("Memory allocation failed\n");
         return 1;
+    }*/
+
+     // Alokácia pre maticu A a S
+    double **A = (double **)malloc(M * sizeof(double *));
+    for (int i = 0; i < M; i++)
+    {
+        A[i] = (double *)malloc(N * sizeof(double));
+    }
+    double **S = (double **)malloc(N * sizeof(double *));
+    for (int i = 0; i < N; i++)
+    {
+        S[i] = (double *)malloc(N * sizeof(double));
     }
 
-    loadData("/Users/hannah/Desktop/go/BL-3602.dat", B, L, H, dg, f);
+
+    loadData("C:/Users/puvak/Downloads/BL-3602.dat", B, L, H, dg, f);
 
     /* //
     for (int i = 0; i < 5; i++)
@@ -122,7 +170,7 @@ int main()
     }
 
     // MATICA A
-    for (int i = 0; i < N; i++)
+    for (int i = 0; i < M; i++)
     {
         for (int j = 0; j < N; j++)
         {
@@ -144,12 +192,24 @@ int main()
         }
     }
 
+
     // Overenie, prvych 5 prvkov
     for (int i = 0; i < 5; i++)
     {
         for (int j = 0; j < 5; j++)
         {
             printf("A[%d][%d] = %.15f\n", i, j, A[i][j]);
+        }
+    }
+
+    // transponovanie plus nasobenie
+    matrix_transpose_multiply(A, S);
+
+    for (int i = 0; i < 5; i++)
+    {
+        for (int j = 0; j < 5; j++)
+        {
+            printf("S[%d][%d] = %.15f\n", i, j, S[i][j]);
         }
     }
 
@@ -291,6 +351,18 @@ int main()
     {
         printf("u[%d] = %.10f\n", i, u[i]);
     }
+
+    //uvolnenie pamate pre maticu A a S
+    for (int i = 0; i < M; i++)
+    {
+        free(A[i]);
+    }
+    free(A);
+    for (int i = 0; i < N; i++)
+    {
+        free(S[i]);
+    }
+    free(S);
 
     // uvolnenie pamate
     free(coordinatesS);
