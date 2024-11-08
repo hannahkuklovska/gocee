@@ -105,6 +105,8 @@ int main()
     double *dg = (double *)malloc(N * sizeof(double));
     double *f = (double *)malloc(N * sizeof(double));
 
+
+    
     // MaticA A
     /*double **A = (double **)malloc(N * sizeof(double *));
     for (int i = 0; i < N; i++)
@@ -129,8 +131,10 @@ int main()
         S[i] = (double *)malloc(N * sizeof(double));
     }
 
+    
 
-    loadData("C:/Users/puvak/Downloads/BL-3602.dat", B, L, H, dg, f);
+
+    loadData("C:/Users/puvak/Downloads/BL-902.dat", B, L, H, dg, f);
 
     /* //
     for (int i = 0; i < 5; i++)
@@ -194,13 +198,13 @@ int main()
 
 
     // Overenie, prvych 5 prvkov
-    for (int i = 0; i < 5; i++)
+    /*for (int i = 0; i < 5; i++)
     {
         for (int j = 0; j < 5; j++)
         {
             printf("A[%d][%d] = %.15f\n", i, j, A[i][j]);
         }
-    }
+    }*/
 
     // transponovanie plus nasobenie
     matrix_transpose_multiply(A, S);
