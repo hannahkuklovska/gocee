@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define N 3602 // pocet meracich bodov
-#define M 32402 // pocet zdrojovych bodov
+#define N 902 // pocet meracich bodov
+#define M 3602 // pocet zdrojovych bodov
 #define TOL 1e-7
 
 // prevod jednotiek
@@ -13,7 +13,7 @@ double rad(double degrees)
 }
 
 // Nacitanie zo suboru
-void loadData(const char *filename, double *B, double *L, double *H, double *dg, double *f)
+/*void loadData(const char *filename, double *B, double *L, double *H, double *dg, double *f)
 {
     FILE *file = fopen(filename, "r");
     if (file == NULL)
@@ -26,7 +26,40 @@ void loadData(const char *filename, double *B, double *L, double *H, double *dg,
         fscanf(file, "%lf %lf %lf %lf %lf", &B[i], &L[i], &H[i], &dg[i], &f[i]);
     }
     fclose(file);
+}*/
+
+// načítanie bodov zo súboru pre Sj (zo súboru BL-3602.dat)
+void loadSourceData(const char *filename, double *B, double *L, double *H)
+{
+    FILE *file = fopen(filename, "r");
+    if (file == NULL)
+    {
+        printf("Unable to open file\n");
+        exit(1);
+    }
+    for (int i = 0; i < M; i++)  // Povedzme M je počet zdrojových bodov
+    {
+        fscanf(file, "%lf %lf %lf", &B[i], &L[i], &H[i]);
+    }
+    fclose(file);
 }
+
+// načítanie bodov merania pre Xi (zo súboru BL-32402.dat)
+void loadMeasurementData(const char *filename, double *B, double *L, double *H)
+{
+    FILE *file = fopen(filename, "r");
+    if (file == NULL)
+    {
+        printf("Unable to open file\n");
+        exit(1);
+    }
+    for (int i = 0; i < N; i++)  // Povedzme N je počet bodov merania
+    {
+        fscanf(file, "%lf %lf %lf", &B[i], &L[i], &H[i]);
+    }
+    fclose(file);
+}
+
 
 // dot product
 double dot_product(const double *vec1, const double *vec2)
@@ -53,13 +86,8 @@ void matrix_vector_mult(double **A, const double *vec, double *result)
 }
 
 //A'*A
-void matrix_transpose_multiply(double **A, double **S)
+/*void matrix_transpose_multiply(double **A, double **A_T, double **S)
 {
-    // Transponovanie matice A
-    double **A_T = (double **)malloc(N * sizeof(double *)); // vytvorenie matice pre transponovanú maticu
-    for (int i = 0; i < N; i++) {
-        A_T[i] = (double *)malloc(M * sizeof(double)); // každému riadku priraď nový stĺpec
-    }
 
     // Vytvorenie transponovanej matice A^T
     for (int i = 0; i < M; i++) {
@@ -73,7 +101,7 @@ void matrix_transpose_multiply(double **A, double **S)
         for (int j = 0; j < N; j++) {
             S[i][j] = 0.0;
             for (int k = 0; k < M; k++) {
-                S[i][j] += A_T[i][k] * A[k][j];  // Vypočíta súčin A_T * A
+                S[i][j] += A_T[k][i] * A[k][j];  // Vypočíta súčin A_T * A
             }
         }
     }
@@ -83,7 +111,7 @@ void matrix_transpose_multiply(double **A, double **S)
         free(A_T[i]);
     }
     free(A_T);
-}
+}*/
 
 
 int main()
@@ -99,11 +127,19 @@ int main()
     double(*coordinatesS)[3] = (double(*)[3])malloc(N * sizeof(double[3])); // S coordinates
     double(*coordinatesX)[3] = (double(*)[3])malloc(N * sizeof(double[3])); // X coordinates
     double(*coordinatesE)[3] = (double(*)[3])malloc(N * sizeof(double[3])); // E coordinates
-    double *B = (double *)malloc(N * sizeof(double));
+    /*double *B = (double *)malloc(N * sizeof(double));
     double *L = (double *)malloc(N * sizeof(double));
-    double *H = (double *)malloc(N * sizeof(double));
+    double *H = (double *)malloc(N * sizeof(double));*/
+    double *B_source = (double *)malloc(M * sizeof(double));
+    double *L_source = (double *)malloc(M * sizeof(double));
+    double *H_source = (double *)malloc(M * sizeof(double));
+
+    double *B_measurement = (double *)malloc(N * sizeof(double));
+    double *L_measurement = (double *)malloc(N * sizeof(double));
+    double *H_measurement = (double *)malloc(N * sizeof(double));
     double *dg = (double *)malloc(N * sizeof(double));
     double *f = (double *)malloc(N * sizeof(double));
+    double *dGMarray = (double *)malloc(N * sizeof(double));
 
 
     
@@ -112,12 +148,13 @@ int main()
     for (int i = 0; i < N; i++)
     {
         A[i] = (double *)malloc(N * sizeof(double));
-    }
-    if (B == NULL || L == NULL || H == NULL || dg == NULL || f == NULL)
+    }*/
+    /*if (B == NULL || L == NULL || H == NULL || dg == NULL || f == NULL)
     {
         printf("Memory allocation failed\n");
         return 1;
     }*/
+
 
      // Alokácia pre maticu A a S
     double **A = (double **)malloc(M * sizeof(double *));
@@ -131,10 +168,20 @@ int main()
         S[i] = (double *)malloc(N * sizeof(double));
     }
 
-    
+    /*if (coordinatesS == NULL || coordinatesX == NULL || coordinatesE == NULL ||
+    A == NULL || S == NULL || B_source == NULL || L_source == NULL ||
+    H_source == NULL || B_measurement == NULL || L_measurement == NULL ||
+    H_measurement == NULL || dg == NULL || f == NULL || dGMarray == NULL ||
+    b == NULL || x == NULL || r == NULL || r_hat == NULL || p == NULL || 
+    s == NULL || t == NULL || v == NULL) {
+    printf("Memory allocation failed\n");
+    return 1;
+}*/
 
+    loadSourceData("C:/Users/puvak/Downloads/BL-902.dat", B_source, L_source, H_source);
+    loadMeasurementData("C:/Users/puvak/Downloads/BL-3602.dat", B_measurement, L_measurement, H_measurement);
+    printf("Data loaded successfully.\n");
 
-    loadData("C:/Users/puvak/Downloads/BL-902.dat", B, L, H, dg, f);
 
     /* //
     for (int i = 0; i < 5; i++)
@@ -145,7 +192,6 @@ int main()
  */
     // Nacitanie potrebnych dat
 
-    double *dGMarray = (double *)malloc(N * sizeof(double));
     for (int i = 0; i < N; i++)
     {
         dGMarray[i] = dGM; // konstantna matica, co bude vlastne nasa parav strana, A*alpha = dGMarray
@@ -154,24 +200,28 @@ int main()
     // koordinaty
     for (int i = 0; i < N; i++)
     {
-        double Brad = rad(B[i]);
-        double Lrad = rad(L[i]);
+        double BSrad = rad(B_source[i]);
+        double LSrad = rad(L_source[i]);
 
         // S coordinates
-        coordinatesS[i][0] = R * cos(Brad) * cos(Lrad); // X
-        coordinatesS[i][1] = R * cos(Brad) * sin(Lrad); // Y
-        coordinatesS[i][2] = R * sin(Brad);             // Z
+        coordinatesS[i][0] = R * cos(BSrad) * cos(LSrad); // X
+        coordinatesS[i][1] = R * cos(BSrad) * sin(LSrad); // Y
+        coordinatesS[i][2] = R * sin(BSrad);             // Z
 
+        double BXrad = rad(B_measurement[i]);
+        double LXrad = rad(L_measurement[i]);
         // X coordinates
-        coordinatesX[i][0] = (R + alt) * cos(Brad) * cos(Lrad); // X
-        coordinatesX[i][1] = (R + alt) * cos(Brad) * sin(Lrad); // Y
-        coordinatesX[i][2] = (R + alt) * sin(Brad);             // Z
+        coordinatesX[i][0] = (R + alt) * cos(BXrad) * cos(LXrad); // X
+        coordinatesX[i][1] = (R + alt) * cos(BXrad) * sin(LXrad); // Y
+        coordinatesX[i][2] = (R + alt) * sin(BXrad);             // Z
 
         // E coordinates
-        coordinatesE[i][0] = cos(Brad) * cos(Lrad); // X
-        coordinatesE[i][1] = cos(Brad) * sin(Lrad); // Y
-        coordinatesE[i][2] = sin(Brad);             // Z
+        coordinatesE[i][0] = cos(BSrad) * cos(LSrad); // X
+        coordinatesE[i][1] = cos(BSrad) * sin(LSrad); // Y
+        coordinatesE[i][2] = sin(BSrad);             // Z
     }
+    printf("Continue...\n");
+
 
     // MATICA A
     for (int i = 0; i < M; i++)
@@ -195,20 +245,56 @@ int main()
             A[i][j] = (1 / pow(rij, 3)) - ((3 * pow(dotProduct, 2)) / pow(rij, 5));
         }
     }
-
+    printf("Continue...\n");
 
     // Overenie, prvych 5 prvkov
-    /*for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 5; i++)
     {
         for (int j = 0; j < 5; j++)
         {
             printf("A[%d][%d] = %.15f\n", i, j, A[i][j]);
         }
-    }*/
+    }
+
+    printf("Continue...\n");
+
+    // Transponovanie matice A
+    double **A_T = (double **)malloc(N * sizeof(double *)); // vytvorenie matice pre transponovanú maticu
+    for (int i = 0; i < N; i++) {
+        A_T[i] = (double *)malloc(M * sizeof(double)); // každému riadku priraď nový stĺpec
+    }
+
+    printf("Continue...\n");
+
+     // Vytvorenie transponovanej matice A^T
+    for (int i = 0; i < M; i++) {
+        for (int j = 0; j < N; j++) {
+            A_T[j][i] = A[i][j];  // Transponovanie: A[i][j] => A_T[j][i]
+        }
+    }
+
+    printf("Continue...\n");
+
+    // Výpočet súčinu A^T * A (A_T * A)
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            S[i][j] = 0.0;
+            for (int k = 0; k < M; k++) {
+                S[i][j] += A_T[i][k] * A[k][j];  // Vypočíta súčin A_T * A
+            }
+        }
+    }
+    printf("Continue...\n");
+
+    // Uvoľnenie pamäte pre A_T
+    for (int i = 0; i < N; i++) {
+        free(A_T[i]);
+    }
+    free(A_T);
 
     // transponovanie plus nasobenie
-    matrix_transpose_multiply(A, S);
-
+    //matrix_transpose_multiply(A, A_T, S);
+    printf("Continue...\n");
     for (int i = 0; i < 5; i++)
     {
         for (int j = 0; j < 5; j++)
@@ -270,6 +356,9 @@ int main()
 
         // α(i) = ρ(i-1) / (r_hatᵀ v(i))
         alpha = rho_new / dot_product(r_hat, v);
+
+        printf("Iteration %d: alpha = %.15f\n", iter, alpha);
+
 
         // s = r(i-1) - α(i) * v(i)
         for (int j = 0; j < N; j++)
@@ -372,9 +461,12 @@ int main()
     free(coordinatesS);
     free(coordinatesX);
     free(coordinatesE);
-    free(B);
-    free(L);
-    free(H);
+    free(B_source);
+    free(L_source);
+    free(H_source);
+    free(B_measurement);
+    free(L_measurement);
+    free(H_measurement);
     free(dg);
     free(f);
     free(dGMarray);
