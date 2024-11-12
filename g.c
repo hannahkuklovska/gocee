@@ -315,13 +315,14 @@ int main()
     double *t = malloc(N * sizeof(double));
     double *v = malloc(N * sizeof(double));
 
+    double *result = malloc(N * sizeof(double));
     // A*x=b
-
+    matrix_vector_mult(A_T, dGMarray_source, result);
     for (int i = 0; i < N; i++)
     {
-        b[i] = dGM;             // do b vlozim hodnoty dGM, prava strana
-        x[i] = 0.0;             // Initial guess x(0) = 0
-        r[i] = r_hat[i] = b[i]; // r = r s vlnkou
+        // b[i] = dGM;             // do b vlozim hodnoty dGM, prava strana
+        x[i] = 0.0;                  // Initial guess x(0) = 0
+        r[i] = r_hat[i] = result[i]; // r = r s vlnkou
     }
 
     double alpha = 1.0, omega = 1.0, rho_new, beta, rho_old = dot_product(r_hat, r);
@@ -355,7 +356,7 @@ int main()
         }
 
         // v(i) = A * p(i)
-        matrix_vector_mult(A, p, v);
+        matrix_vector_mult(S, p, v);
 
         // α(i) = ρ(i-1) / (r_hatᵀ v(i))
         alpha = rho_new / dot_product(r_hat, v);
@@ -381,7 +382,7 @@ int main()
         }
 
         // t = A * s
-        matrix_vector_mult(A, s, t);
+        matrix_vector_mult(S, s, t);
 
         // ω(i) = (tᵀ s) / (tᵀ t)
         omega = dot_product(t, s) / dot_product(t, t);
