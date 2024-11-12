@@ -176,8 +176,8 @@ int main()
     return 1;
 }*/
 
-    loadSourceData("/Users/hannah/Desktop/gocee/BL-3602.dat", B_source, L_source, H_source, dg_source, f_source);
-    loadMeasurementData("/Users/hannah/Desktop/gocee/BL-902.dat", B_measurement, L_measurement, H_measurement, dg_measurement, f_measurement);
+    loadSourceData("/Users/hannah/Desktop/gocee/BL-8102.dat", B_source, L_source, H_source, dg_source, f_source);
+    loadMeasurementData("/Users/hannah/Desktop/gocee/BL-3602.dat", B_measurement, L_measurement, H_measurement, dg_measurement, f_measurement);
     printf("Data loaded successfully.\n");
 
     /* //
@@ -288,12 +288,12 @@ int main()
     }
     printf("Continue...\n");
 
-    // Uvoľnenie pamäte pre A_T
-    for (int i = 0; i < N; i++)
-    {
-        free(A_T[i]);
-    }
-    free(A_T);
+    /*   // Uvoľnenie pamäte pre A_T
+      for (int i = 0; i < N; i++)
+      {
+          free(A_T[i]);
+      }
+      free(A_T); */
 
     // transponovanie plus nasobenie
     // matrix_transpose_multiply(A, A_T, S);
@@ -317,7 +317,7 @@ int main()
 
     double *result = malloc(N * sizeof(double));
     // A*x=b
-    matrix_vector_mult(A_T, dGMarray_source, result);
+    matrix_vector_mult(A_T, dGMarray, result);
     for (int i = 0; i < N; i++)
     {
         // b[i] = dGM;             // do b vlozim hodnoty dGM, prava strana
@@ -459,6 +459,13 @@ int main()
         free(S[i]);
     }
     free(S);
+
+    // Uvoľnenie pamäte pre A_T
+    for (int i = 0; i < N; i++)
+    {
+        free(A_T[i]);
+    }
+    free(A_T);
 
     // uvolnenie pamate
     free(coordinatesS);
