@@ -208,6 +208,13 @@ int main()
             }
         }
     }
+
+    printf("Matrix A^T (transposed, accessed as A[j][i]):\n");
+    for (int i = 0; i < 5 && i < N; i++) {
+        for (int j = 0; j < 5 && j < M; j++) {
+            printf("A_T[%d][%d] (accessed as A[%d][%d]) = %.12f\n", i, j, j, i, A[j][i]);
+    }
+}
    /*  // uvolnenie pamate pre maticu A a S
     for (int i = 0; i < M; i++)
     {
