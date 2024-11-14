@@ -243,7 +243,7 @@ int main()
     {
         at_dg[i] = 0.0;
         
-        at_dg[k] += A[k][i] * dGMarray_source[i];
+        at_dg[k] += A[i][k] * dGMarray_source[i];
        
     } 
     }
