@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define N 902  // pocet meracich bodov
-#define M 3602 // pocet zdrojovych bodov
+#define N 3602 // pocet meracich bodov
+#define M 8102 // pocet zdrojovych bodov
 #define TOL 1e-7
 
 // prevod jednotiek
@@ -117,8 +117,8 @@ int main()
     return 1;
 }*/
 
-    loadSourceData("/Users/hannah/Desktop/gocee/BL-3602.dat", B_source, L_source, H_source, dg_source, f_source);
-    loadMeasurementData("/Users/hannah/Desktop/gocee/BL-902.dat", B_measurement, L_measurement, H_measurement, dg_measurement, f_measurement);
+    loadSourceData("/Users/hannah/Desktop/gocee/BL-8102.dat", B_source, L_source, H_source, dg_source, f_source);
+    loadMeasurementData("/Users/hannah/Desktop/gocee/BL-3602.dat", B_measurement, L_measurement, H_measurement, dg_measurement, f_measurement);
     printf("Data loaded successfully.\n");
 
     // Nacitanie potrebnych dat
@@ -151,6 +151,17 @@ int main()
         coordinatesE[i][1] = cos(BSrad) * sin(LSrad); // Y
         coordinatesE[i][2] = sin(BSrad);              // Z
     }
+
+    free(B_source);
+    free(L_source);
+    free(H_source);
+    free(B_measurement);
+    free(L_measurement);
+    free(H_measurement);
+    free(dg_measurement);
+    free(f_source);
+    free(dg_source);
+    free(f_measurement);
     printf("Prešli koordinaty, Continue...\n");
 
     // MATICA A
@@ -220,6 +231,11 @@ int main()
             }
         }
     }
+    // uvolnenie pamate pre maticu A a S
+    for (int i = 0; i < M; i++)
+    {
+        free(A[i]);
+    }
     printf("Prešiel súčin AT*A, teda vznikla S, Continue...\n");
 
     for (int i = 0; i < 5; i++)
@@ -252,6 +268,12 @@ int main()
             at_dg[i] += A_T[i][j] * dGMarray_source[j];
         }
     }
+    // Uvoľnenie pamäte pre A_T
+    for (int i = 0; i < N; i++)
+    {
+        free(A_T[i]);
+    }
+    free(A_T);
     printf("Vytvorila sa PS pre BCG, AT*dgM_source, Continue...\n");
 
     // A*x=b
@@ -401,30 +423,30 @@ int main()
         printf("u[%d] = %.10f\n", i, u[i]);
     }
 
-    // uvolnenie pamate pre maticu A a S
-    for (int i = 0; i < M; i++)
-    {
-        free(A[i]);
-    }
-    free(A);
+    /*  // uvolnenie pamate pre maticu A a S
+     for (int i = 0; i < M; i++)
+     {
+         free(A[i]);
+     }
+     free(A); */
     for (int i = 0; i < N; i++)
     {
         free(S[i]);
     }
     free(S);
 
-    // Uvoľnenie pamäte pre A_T
-    for (int i = 0; i < N; i++)
-    {
-        free(A_T[i]);
-    }
-    free(A_T);
+    /*  // Uvoľnenie pamäte pre A_T
+     for (int i = 0; i < N; i++)
+     {
+         free(A_T[i]);
+     }
+     free(A_T); */
 
     // uvolnenie pamate
     free(coordinatesS);
     free(coordinatesX);
     free(coordinatesE);
-    free(B_source);
+    /* free(B_source);
     free(L_source);
     free(H_source);
     free(B_measurement);
@@ -433,7 +455,7 @@ int main()
     free(dg_measurement);
     free(f_source);
     free(dg_source);
-    free(f_measurement);
+    free(f_measurement); */
     free(dGMarray);
     free(b);
     free(x);
