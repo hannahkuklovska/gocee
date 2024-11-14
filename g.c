@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define N 3602 // pocet meracich bodov
-#define M 8102 // pocet zdrojovych bodov
+#define N 8102 // pocet meracich bodov
+#define M 32402 // pocet zdrojovych bodov
 #define TOL 1e-7
 
 // prevod jednotiek
@@ -117,8 +117,8 @@ int main()
     return 1;
 }*/
 
-    loadSourceData("/Users/hannah/Desktop/gocee/BL-8102.dat", B_source, L_source, H_source, dg_source, f_source);
-    loadMeasurementData("/Users/hannah/Desktop/gocee/BL-3602.dat", B_measurement, L_measurement, H_measurement, dg_measurement, f_measurement);
+    loadSourceData("/Users/ninalackovicova/Downloads/BL-32402.dat", B_source, L_source, H_source, dg_source, f_source);
+    loadMeasurementData("/Users/ninalackovicova/Downloads/BL-8102.dat", B_measurement, L_measurement, H_measurement, dg_measurement, f_measurement);
     printf("Data loaded successfully.\n");
 
     // Nacitanie potrebnych dat
