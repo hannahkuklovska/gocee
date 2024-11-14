@@ -205,21 +205,12 @@ int main()
             for (int k = 0; k < M; k++)
             {
                 S[i][j] += A[k][j] * A[k][i]; // Vypočíta súčin A_T * A
+                //printf("A_T[%d][%d]  = %e\n", k, j, A[k][j]);
+
             }
         }
     }
 
-    printf("Matrix A^T (transposed, accessed as A[j][i]):\n");
-    for (int i = 0; i < 5 && i < N; i++) {
-        for (int j = 0; j < 5 && j < M; j++) {
-            printf("A_T[%d][%d] (accessed as A[%d][%d]) = %.12f\n", i, j, j, i, A[j][i]);
-    }
-}
-   /*  // uvolnenie pamate pre maticu A a S
-    for (int i = 0; i < M; i++)
-    {
-        free(A[i]);
-    } */
     printf("Prešiel súčin AT*A, teda vznikla S, Continue...\n");
 
     for (int i = 0; i < 5; i++)
