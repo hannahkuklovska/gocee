@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define N 3602 // pocet meracich bodov
-#define M 8102 // pocet zdrojovych bodov
+#define N 902  // pocet meracich bodov
+#define M 3602 // pocet zdrojovych bodov
 #define TOL 1e-7
 
 // prevod jednotiek
@@ -12,23 +12,7 @@ double rad(double degrees)
     return (degrees * M_PI) / 180.0;
 }
 
-// Nacitanie zo suboru
-/*void loadData(const char *filename, double *B, double *L, double *H, double *dg, double *f)
-{
-    FILE *file = fopen(filename, "r");
-    if (file == NULL)
-    {
-        printf("Unable to open file\n");
-        exit(1);
-    }
-    for (int i = 0; i < N; i++)
-    {
-        fscanf(file, "%lf %lf %lf %lf %lf", &B[i], &L[i], &H[i], &dg[i], &f[i]);
-    }
-    fclose(file);
-}*/
-
-// načítanie bodov zo súboru pre Sj (zo súboru BL-3602.dat)
+// načítanie bodov zo súboru pre Sj  (zo súboru BL-32402.dat) //tieto budu vzdy tie vacsie
 void loadSourceData(const char *filename, double *B, double *L, double *H, double *dg, double *f)
 {
     FILE *file = fopen(filename, "r");
@@ -44,7 +28,7 @@ void loadSourceData(const char *filename, double *B, double *L, double *H, doubl
     fclose(file);
 }
 
-// načítanie bodov merania pre Xi (zo súboru BL-32402.dat)
+// načítanie bodov merania pre Xi (zo súboru BL-3602.dat) //tieto budu vzdy tie mensie
 void loadMeasurementData(const char *filename, double *B, double *L, double *H, double *dg, double *f)
 {
     FILE *file = fopen(filename, "r");
@@ -84,34 +68,6 @@ void matrix_vector_mult(double **A, const double *vec, double *result)
     }
 }
 
-// A'*A
-/*void matrix_transpose_multiply(double **A, double **A_T, double **S)
-{
-
-    // Vytvorenie transponovanej matice A^T
-    for (int i = 0; i < M; i++) {
-        for (int j = 0; j < N; j++) {
-            A_T[j][i] = A[i][j];  // Transponovanie: A[i][j] => A_T[j][i]
-        }
-    }
-
-    // Výpočet súčinu A^T * A (A_T * A)
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            S[i][j] = 0.0;
-            for (int k = 0; k < M; k++) {
-                S[i][j] += A_T[k][i] * A[k][j];  // Vypočíta súčin A_T * A
-            }
-        }
-    }
-
-    // Uvoľnenie pamäte pre A_T
-    for (int i = 0; i < N; i++) {
-        free(A_T[i]);
-    }
-    free(A_T);
-}*/
-
 int main()
 {
 
@@ -125,9 +81,6 @@ int main()
     double(*coordinatesS)[3] = (double(*)[3])malloc(N * sizeof(double[3])); // S coordinates
     double(*coordinatesX)[3] = (double(*)[3])malloc(N * sizeof(double[3])); // X coordinates
     double(*coordinatesE)[3] = (double(*)[3])malloc(N * sizeof(double[3])); // E coordinates
-    /*double *B = (double *)malloc(N * sizeof(double));
-    double *L = (double *)malloc(N * sizeof(double));
-    double *H = (double *)malloc(N * sizeof(double));*/
     double *B_source = (double *)malloc(M * sizeof(double));
     double *L_source = (double *)malloc(M * sizeof(double));
     double *H_source = (double *)malloc(M * sizeof(double));
@@ -141,18 +94,6 @@ int main()
     double *dg_measurement = (double *)malloc(N * sizeof(double));
     double *f_measurement = (double *)malloc(N * sizeof(double));
     double *dGMarray = (double *)malloc(N * sizeof(double));
-
-    // MaticA A
-    /*double **A = (double **)malloc(N * sizeof(double *));
-    for (int i = 0; i < N; i++)
-    {
-        A[i] = (double *)malloc(N * sizeof(double));
-    }*/
-    /*if (B == NULL || L == NULL || H == NULL || dg == NULL || f == NULL)
-    {
-        printf("Memory allocation failed\n");
-        return 1;
-    }*/
 
     // Alokácia pre maticu A a S
     double **A = (double **)malloc(M * sizeof(double *));
@@ -176,22 +117,15 @@ int main()
     return 1;
 }*/
 
-    loadSourceData("/Users/hannah/Desktop/gocee/BL-8102.dat", B_source, L_source, H_source, dg_source, f_source);
-    loadMeasurementData("/Users/hannah/Desktop/gocee/BL-3602.dat", B_measurement, L_measurement, H_measurement, dg_measurement, f_measurement);
+    loadSourceData("/Users/hannah/Desktop/gocee/BL-3602.dat", B_source, L_source, H_source, dg_source, f_source);
+    loadMeasurementData("/Users/hannah/Desktop/gocee/BL-902.dat", B_measurement, L_measurement, H_measurement, dg_measurement, f_measurement);
     printf("Data loaded successfully.\n");
 
-    /* //
-    for (int i = 0; i < 5; i++)
-    {
-        printf("B[%d] = %.2f, L[%d] = %.2f, H[%d] = %.2f, dg[%d] = %.2f, f[%d] = %.2f\n",
-               i, B[i], i, L[i], i, H[i], i, dg[i], i, f[i]);
-    }
- */
     // Nacitanie potrebnych dat
 
-    for (int i = 0; i < N; i++)
+    for (int i = 0; i < M; i++) // pre source pointy
     {
-        dGMarray[i] = dGM; // konstantna matica, co bude vlastne nasa parav strana, A*alpha = dGMarray
+        dGMarray_source[i] = dGM; // konstantna matica, co bude vlastne nasa parav strana, A*alpha = dGMarray
     }
 
     // koordinaty
@@ -217,7 +151,7 @@ int main()
         coordinatesE[i][1] = cos(BSrad) * sin(LSrad); // Y
         coordinatesE[i][2] = sin(BSrad);              // Z
     }
-    printf("Continue...\n");
+    printf("Prešli koordinaty, Continue...\n");
 
     // MATICA A
     for (int i = 0; i < M; i++)
@@ -241,7 +175,7 @@ int main()
             A[i][j] = (1 / pow(rij, 3)) - ((3 * pow(dotProduct, 2)) / pow(rij, 5));
         }
     }
-    printf("Continue...\n");
+    printf("prešlo vytvorenie A, Continue...\n");
 
     // Overenie, prvych 5 prvkov
     for (int i = 0; i < 5; i++)
@@ -252,7 +186,7 @@ int main()
         }
     }
 
-    printf("Continue...\n");
+    printf("Vytlačili sa prvky A, Continue...\n");
 
     // Transponovanie matice A
     double **A_T = (double **)malloc(N * sizeof(double *)); // vytvorenie matice pre transponovanú maticu
@@ -261,7 +195,7 @@ int main()
         A_T[i] = (double *)malloc(M * sizeof(double)); // každému riadku priraď nový stĺpec
     }
 
-    printf("Continue...\n");
+    printf("Alokovalo sa miesto pre AT, Continue...\n");
 
     // Vytvorenie transponovanej matice A^T
     for (int i = 0; i < M; i++)
@@ -272,7 +206,7 @@ int main()
         }
     }
 
-    printf("Continue...\n");
+    printf("Vytvorila sa AT, Continue...\n");
 
     // Výpočet súčinu A^T * A (A_T * A)
     for (int i = 0; i < N; i++)
@@ -286,18 +220,8 @@ int main()
             }
         }
     }
-    printf("Continue...\n");
+    printf("Prešiel súčin AT*A, teda vznikla S, Continue...\n");
 
-    /*   // Uvoľnenie pamäte pre A_T
-      for (int i = 0; i < N; i++)
-      {
-          free(A_T[i]);
-      }
-      free(A_T); */
-
-    // transponovanie plus nasobenie
-    // matrix_transpose_multiply(A, A_T, S);
-    printf("Continue...\n");
     for (int i = 0; i < 5; i++)
     {
         for (int j = 0; j < 5; j++)
@@ -305,6 +229,8 @@ int main()
             printf("S[%d][%d] = %.15f\n", i, j, S[i][j]);
         }
     }
+
+    printf("Vytlačili sa prvé prvky S, , Continue...\n");
 
     double *b = (double *)malloc(N * sizeof(double));
     double *x = (double *)malloc(N * sizeof(double)); // Initial guess x(0)
@@ -314,15 +240,27 @@ int main()
     double *s = malloc(N * sizeof(double));
     double *t = malloc(N * sizeof(double));
     double *v = malloc(N * sizeof(double));
+    double *at_dg = malloc(N * sizeof(double));
 
-    double *result = malloc(N * sizeof(double));
-    // A*x=b
-    matrix_vector_mult(A_T, dGMarray, result);
+    // Perform A_T * dgM_source
+    // A_T NxM dgM_source Mx1
     for (int i = 0; i < N; i++)
     {
-        // b[i] = dGM;             // do b vlozim hodnoty dGM, prava strana
-        x[i] = 0.0;                  // Initial guess x(0) = 0
-        r[i] = r_hat[i] = result[i]; // r = r s vlnkou
+        at_dg[i] = 0.0;
+        for (int j = 0; j < M; j++)
+        {
+            at_dg[i] += A_T[i][j] * dGMarray_source[j];
+        }
+    }
+    printf("Vytvorila sa PS pre BCG, AT*dgM_source, Continue...\n");
+
+    // A*x=b
+    for (int i = 0; i < N; i++)
+    {
+        // b[i] = dGM;             // do b vlozim hodnoty dGM, prava strana //resp AT*dgM(vektor velkosti M)
+        x[i] = 0.0;                 // Initial guess x(0) = 0
+        r[i] = r_hat[i] = at_dg[i]; // r = r s vlnkou
+        // PS bude teraz AT*dg
     }
 
     double alpha = 1.0, omega = 1.0, rho_new, beta, rho_old = dot_product(r_hat, r);
@@ -355,13 +293,20 @@ int main()
             }
         }
 
-        // v(i) = A * p(i)
-        matrix_vector_mult(S, p, v);
+        // v(i) = A * p(i) //S*p(i)
+        // matrix_vector_mult(S, p, v);
+
+        for (int i = 0; i < N; i++)
+        {
+            v[i] = 0.0;
+            for (int j = 0; j < N; j++)
+            {
+                v[i] += S[i][j] * p[j];
+            }
+        }
 
         // α(i) = ρ(i-1) / (r_hatᵀ v(i))
         alpha = rho_new / dot_product(r_hat, v);
-
-        // printf("Iteration %d: alpha = %.15f\n", iter, alpha);
 
         // s = r(i-1) - α(i) * v(i)
         for (int j = 0; j < N; j++)
@@ -369,7 +314,7 @@ int main()
             s[j] = r[j] - alpha * v[j];
         }
 
-        // Check if norm(s) is small enough to stop
+        // je norma prilis mala?
         double norm_s = sqrt(dot_product(s, s));
         if (norm_s < TOL)
         {
@@ -381,8 +326,16 @@ int main()
             break;
         }
 
-        // t = A * s
-        matrix_vector_mult(S, s, t);
+        // t = A * s //S÷s
+        // matrix_vector_mult(S, s, t);
+        for (int i = 0; i < N; i++)
+        {
+            t[i] = 0.0;
+            for (int j = 0; j < N; j++)
+            {
+                t[i] += S[i][j] * s[j];
+            }
+        }
 
         // ω(i) = (tᵀ s) / (tᵀ t)
         omega = dot_product(t, s) / dot_product(t, t);
@@ -488,11 +441,8 @@ int main()
     free(r_hat);
     free(p);
     free(u);
-
     free(s);
-
     free(t);
     free(v);
-
     return 0;
 }
