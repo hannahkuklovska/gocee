@@ -204,7 +204,7 @@ int main()
             S[i][j] = 0.0;
             for (int k = 0; k < M; k++)
             {
-                S[i][j] += A[k][i] * A[k][j]; // Vypočíta súčin A_T * A
+                S[i][j] += A[k][j] * A[k][i]; // Vypočíta súčin A_T * A
             }
         }
     }
@@ -243,7 +243,7 @@ int main()
     {
         at_dg[i] = 0.0;
         
-        at_dg[k] += A[i][k] * dGMarray_source[i];
+        at_dg[k] += A[k][i] * dGMarray_source[i];
        
     } 
     }
