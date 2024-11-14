@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-
-#define N 8102 // pocet meracich bodov
-#define M 32402 // pocet zdrojovych bodov
+//vystupny subor B a L a u do stvorcovej
+//q - posledny stlpec suboru bude prava strana
+#define N 902 // pocet meracich bodov
+#define M 3602 // pocet zdrojovych bodov
 #define TOL 1e-7
 
 // prevod jednotiek
@@ -93,7 +94,8 @@ int main()
     double *H_measurement = (double *)malloc(N * sizeof(double));
     double *dg_measurement = (double *)malloc(N * sizeof(double));
     double *f_measurement = (double *)malloc(N * sizeof(double));
-    double *dGMarray = (double *)malloc(N * sizeof(double));
+    double *u = calloc(N, sizeof(double));
+   
 
     // Alokácia pre maticu A a S
     double **A = (double **)malloc(M * sizeof(double *));
@@ -117,8 +119,8 @@ int main()
     return 1;
 }*/
 
-    loadSourceData("/Users/ninalackovicova/Downloads/BL-32402.dat", B_source, L_source, H_source, dg_source, f_source);
-    loadMeasurementData("/Users/ninalackovicova/Downloads/BL-8102.dat", B_measurement, L_measurement, H_measurement, dg_measurement, f_measurement);
+    loadSourceData("/Users/ninalackovicova/Downloads/BL-3602.dat", B_source, L_source, H_source, dg_source, f_source);
+    loadMeasurementData("/Users/ninalackovicova/Downloads/BL-902.dat", B_measurement, L_measurement, H_measurement, dg_measurement, f_measurement);
     printf("Data loaded successfully.\n");
 
     // Nacitanie potrebnych dat
@@ -152,16 +154,7 @@ int main()
         coordinatesE[i][2] = sin(BSrad);              // Z
     }
 
-    free(B_source);
-    free(L_source);
-    free(H_source);
-    free(B_measurement);
-    free(L_measurement);
-    free(H_measurement);
-    free(dg_measurement);
-    free(f_source);
-    free(dg_source);
-    free(f_measurement);
+    
     printf("Prešli koordinaty, Continue...\n");
 
     // MATICA A
@@ -199,25 +192,9 @@ int main()
 
     printf("Vytlačili sa prvky A, Continue...\n");
 
-    // Transponovanie matice A
-    double **A_T = (double **)malloc(N * sizeof(double *)); // vytvorenie matice pre transponovanú maticu
-    for (int i = 0; i < N; i++)
-    {
-        A_T[i] = (double *)malloc(M * sizeof(double)); // každému riadku priraď nový stĺpec
-    }
-
-    printf("Alokovalo sa miesto pre AT, Continue...\n");
-
-    // Vytvorenie transponovanej matice A^T
-    for (int i = 0; i < M; i++)
-    {
-        for (int j = 0; j < N; j++)
-        {
-            A_T[j][i] = A[i][j]; // Transponovanie: A[i][j] => A_T[j][i]
-        }
-    }
-
-    printf("Vytvorila sa AT, Continue...\n");
+   
+ 
+   
 
     // Výpočet súčinu A^T * A (A_T * A)
     for (int i = 0; i < N; i++)
@@ -227,15 +204,15 @@ int main()
             S[i][j] = 0.0;
             for (int k = 0; k < M; k++)
             {
-                S[i][j] += A_T[i][k] * A[k][j]; // Vypočíta súčin A_T * A
+                S[i][j] += A[k][i] * A[k][j]; // Vypočíta súčin A_T * A
             }
         }
     }
-    // uvolnenie pamate pre maticu A a S
+   /*  // uvolnenie pamate pre maticu A a S
     for (int i = 0; i < M; i++)
     {
         free(A[i]);
-    }
+    } */
     printf("Prešiel súčin AT*A, teda vznikla S, Continue...\n");
 
     for (int i = 0; i < 5; i++)
@@ -260,20 +237,17 @@ int main()
 
     // Perform A_T * dgM_source
     // A_T NxM dgM_source Mx1
-    for (int i = 0; i < N; i++)
+    for (int k = 0; k < N; k++)
+    {
+    for (int i = 0; i < M; i++)
     {
         at_dg[i] = 0.0;
-        for (int j = 0; j < M; j++)
-        {
-            at_dg[i] += A_T[i][j] * dGMarray_source[j];
-        }
+        
+        at_dg[k] += A[k][i] * dGMarray_source[i];
+       
+    } 
     }
-    // Uvoľnenie pamäte pre A_T
-    for (int i = 0; i < N; i++)
-    {
-        free(A_T[i]);
-    }
-    free(A_T);
+   
     printf("Vytvorila sa PS pre BCG, AT*dgM_source, Continue...\n");
 
     // A*x=b
@@ -316,7 +290,7 @@ int main()
         }
 
         // v(i) = A * p(i) //S*p(i)
-        // matrix_vector_mult(S, p, v);
+        
 
         for (int i = 0; i < N; i++)
         {
@@ -349,7 +323,7 @@ int main()
         }
 
         // t = A * s //S÷s
-        // matrix_vector_mult(S, s, t);
+        
         for (int i = 0; i < N; i++)
         {
             t[i] = 0.0;
@@ -398,8 +372,7 @@ int main()
     {
         printf("x[%d] = %.15f\n", i, x[i]);
     }
-    double *u = calloc(N, sizeof(double)); // malloc, ale aj vynuluje vektor u, ktory bude konst
-
+   
     for (int i = 0; i < N; i++)
     {
         for (int j = 0; j < N; j++)
@@ -423,46 +396,42 @@ int main()
         printf("u[%d] = %.10f\n", i, u[i]);
     }
 
-    /*  // uvolnenie pamate pre maticu A a S
-     for (int i = 0; i < M; i++)
-     {
-         free(A[i]);
-     }
-     free(A); */
+   
     for (int i = 0; i < N; i++)
     {
         free(S[i]);
     }
     free(S);
 
-    /*  // Uvoľnenie pamäte pre A_T
-     for (int i = 0; i < N; i++)
-     {
-         free(A_T[i]);
-     }
-     free(A_T); */
+   
 
     // uvolnenie pamate
     free(coordinatesS);
     free(coordinatesX);
     free(coordinatesE);
-    /* free(B_source);
+    free(at_dg);
+    free(B_source);
     free(L_source);
     free(H_source);
     free(B_measurement);
+    free(dGMarray_source);
     free(L_measurement);
     free(H_measurement);
     free(dg_measurement);
     free(f_source);
     free(dg_source);
-    free(f_measurement); */
-    free(dGMarray);
+    free(f_measurement); 
     free(b);
     free(x);
     free(r);
     free(r_hat);
     free(p);
     free(u);
+    for (int i = 0; i < M; i++)
+    {
+        free(A[i]);
+    }
+    free(A);
     free(s);
     free(t);
     free(v);
