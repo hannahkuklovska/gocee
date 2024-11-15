@@ -4,7 +4,7 @@
 //vystupny subor B a L a u do stvorcovej
 //q - posledny stlpec suboru bude prava strana
 #define N 902 // pocet meracich bodov
-#define M 3602 // pocet zdrojovych bodov
+#define M 902 // pocet zdrojovych bodov
 #define TOL 1e-7
 
 // prevod jednotiek
@@ -119,8 +119,8 @@ int main()
     return 1;
 }*/
 
-    loadSourceData("/Users/ninalackovicova/Downloads/BL-3602.dat", B_source, L_source, H_source, dg_source, f_source);
-    loadMeasurementData("/Users/ninalackovicova/Downloads/BL-902.dat", B_measurement, L_measurement, H_measurement, dg_measurement, f_measurement);
+    loadSourceData("C:/Users/puvak/Downloads/BL-3602.dat", B_source, L_source, H_source, dg_source, f_source);
+    loadMeasurementData("C:/Users/puvak/Downloads/BL-3602.dat", B_measurement, L_measurement, H_measurement, dg_measurement, f_measurement);
     printf("Data loaded successfully.\n");
 
     // Nacitanie potrebnych dat
@@ -197,25 +197,28 @@ int main()
    
 
     // Výpočet súčinu A^T * A (A_T * A)
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = 0; j < N; j++)
-        {
-            S[i][j] = 0.0;
-            for (int k = 0; k < M; k++)
-            {
-                S[i][j] += A[k][j] * A[k][i]; // Vypočíta súčin A_T * A
-                //printf("A_T[%d][%d]  = %e\n", k, j, A[k][j]);
-
-            }
+for (int i = 0; i < N; i++) {
+    for (int j = i; j < N; j++) { // začíname od i, aby sme vypĺňali len hornú časť
+        S[i][j] = 0.0;
+        for (int k = 0; k < M; k++) {
+            S[i][j] += A[k][j] * A[k][i];
         }
     }
+}
+
+for (int i = 0; i < N; i++) {
+    for (int j = 0; j < i; j++) {
+        S[i][j] = S[j][i];
+    }
+}
+
+
 
     printf("Prešiel súčin AT*A, teda vznikla S, Continue...\n");
 
     for (int i = 0; i < 5; i++)
     {
-        for (int j = 0; j < 5; j++)
+        for (int j = i; j < 5; j++)
         {
             printf("S[%d][%d] = %.15f\n", i, j, S[i][j]);
         }
@@ -237,14 +240,19 @@ int main()
     // A_T NxM dgM_source Mx1
     for (int k = 0; k < N; k++)
     {
+        at_dg[k] = 0.0;
     for (int i = 0; i < M; i++)
     {
-        at_dg[i] = 0.0;
         
         at_dg[k] += A[k][i] * dGMarray_source[i];
        
     } 
     }
+
+    for (int i = 0; i < N; i++) {
+    printf("b[%d] = %.10f\n", i, b[i]);
+}
+
    
     printf("Vytvorila sa PS pre BCG, AT*dgM_source, Continue...\n");
 
