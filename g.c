@@ -3,8 +3,8 @@
 #include <math.h>
 //vystupny subor B a L a u do stvorcovej
 //q - posledny stlpec suboru bude prava strana
-#define N 902 // pocet meracich bodov
-#define M 3602 // pocet zdrojovych bodov
+#define N 3602 // pocet meracich bodov
+#define M 8102 // pocet zdrojovych bodov
 #define TOL 1e-7
 
 // prevod jednotiek
@@ -119,8 +119,8 @@ int main()
     return 1;
 }*/
 
-    loadSourceData("/Users/ninalackovicova/Downloads/BL-3602.dat", B_source, L_source, H_source, dg_source, f_source);
-    loadMeasurementData("/Users/ninalackovicova/Downloads/BL-902.dat", B_measurement, L_measurement, H_measurement, dg_measurement, f_measurement);
+    loadSourceData("/Users/ninalackovicova/Downloads/BL-8102.dat", B_source, L_source, H_source, dg_source, f_source);
+    loadMeasurementData("/Users/ninalackovicova/Downloads/BL-3602.dat", B_measurement, L_measurement, H_measurement, dg_measurement, f_measurement);
     printf("Data loaded successfully.\n");
 
     // Nacitanie potrebnych dat
@@ -244,7 +244,7 @@ for (int i = 0; i < N; i++) {
     for (int i = 0; i < M; i++)
     {
         
-        at_dg[k] += A[i][k] * dGMarray_source[i];
+        at_dg[k] += A[k][i] * dGMarray_source[i];
        
     } 
     }
