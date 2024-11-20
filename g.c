@@ -244,7 +244,7 @@ for (int i = 0; i < N; i++) {
     for (int i = 0; i < M; i++)
     {
         
-        at_dg[k] += A[k][i] * dGMarray_source[i];
+        at_dg[k] += A[i][k] * dGMarray_source[i];
        
     } 
     }
