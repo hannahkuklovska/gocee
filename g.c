@@ -3,6 +3,7 @@
 #include <math.h>
 #include <omp.h>
 
+//stvorcova alt bude z ineho suboru unho velke H u nas alt -> alt bude zo suboru
 //vystupny subor B a L a u do stvorcovej
 //q - posledny stlpec suboru bude prava strana
 #define N 3602 // pocet zdrojovych bodov
