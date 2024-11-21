@@ -4,6 +4,8 @@
 #include <omp.h>
 
 //stvorcova alt bude z ineho suboru unho velke H u nas alt -> alt bude zo suboru
+//menej bodov H zo suboru do S bodov u nas opacne, alt sa bude v druhom tiez menit 
+//do Bci... kde je matica x vektor dat pragmu
 //vystupny subor B a L a u do stvorcovej
 //q - posledny stlpec suboru bude prava strana
 #define N 3602 // pocet zdrojovych bodov
@@ -62,6 +64,7 @@ double dot_product(const double *vec1, const double *vec2)
 // matica*vektor
 void matrix_vector_mult(double **A, const double *vec, double *result)
 {
+    #pragma omp parallel for
     for (int i = 0; i < N; i++)
     {
         result[i] = 0.0;
