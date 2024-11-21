@@ -249,6 +249,7 @@ int main()
     {
         printf("u[%d] = %.10f\n", i, u[i]);
     }
+   
     // uvolnenie pamate
     free(coordinatesS);
     free(coordinatesX);

@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <omp.h>
+
 //vystupny subor B a L a u do stvorcovej
 //q - posledny stlpec suboru bude prava strana
-#define N 8102 // pocet meracich bodov
-#define M 3602 // pocet zdrojovych bodov
+#define N 3602 // pocet zdrojovych bodov
+#define M 8102 // pocet meracich bodov
 #define TOL 1e-7
 
 // prevod jednotiek
@@ -94,8 +96,8 @@ int main()
     double *H_measurement = (double *)malloc(N * sizeof(double));
     double *dg_measurement = (double *)malloc(N * sizeof(double));
     double *f_measurement = (double *)malloc(N * sizeof(double));
-    double *u = calloc(N, sizeof(double));
-   
+    double *u = calloc(M, sizeof(double));
+    omp_set_num_threads(8); //pôjde to na 4 jadrach
 
     // Alokácia pre maticu A a S
     double **A = (double **)malloc(M * sizeof(double *));
@@ -119,8 +121,8 @@ int main()
     return 1;
 }*/
 
-    loadSourceData("/Users/ninalackovicova/Downloads/BL-3602.dat", B_source, L_source, H_source, dg_source, f_source);
-    loadMeasurementData("/Users/ninalackovicova/Downloads/BL-8102.dat", B_measurement, L_measurement, H_measurement, dg_measurement, f_measurement);
+    loadSourceData("/Users/ninalackovicova/Downloads/BL-8102.dat", B_source, L_source, H_source, dg_source, f_source);
+    loadMeasurementData("/Users/ninalackovicova/Downloads/BL-3602.dat", B_measurement, L_measurement, H_measurement, dg_measurement, f_measurement);
     printf("Data loaded successfully.\n");
 
     // Nacitanie potrebnych dat
@@ -149,6 +151,7 @@ int main()
         coordinatesX[i][2] = (R + alt) * sin(BXrad);              // Z
 
         // E coordinates
+
         coordinatesE[i][0] = cos(BSrad) * cos(LSrad); // X
         coordinatesE[i][1] = cos(BSrad) * sin(LSrad); // Y
         coordinatesE[i][2] = sin(BSrad);              // Z
@@ -197,20 +200,21 @@ int main()
    
 
     // Výpočet súčinu A^T * A (A_T * A)
-for (int i = 0; i < N; i++) {
-    for (int j = i; j < N; j++) { // začíname od i, aby sme vypĺňali len hornú časť
-        S[i][j] = 0.0;
-        for (int k = 0; k < M; k++) {
-            S[i][j] += A[k][j] * A[k][i];
+    #pragma omp parallel for
+    for (int i = 0; i < N; i++) {
+        for (int j = i; j < N; j++) { // začíname od i, aby sme vypĺňali len hornú časť
+            S[i][j] = 0.0;
+            for (int k = 0; k < M; k++) {
+                S[i][j] += A[k][j] * A[k][i];
+            }
         }
     }
-}
 
-for (int i = 0; i < N; i++) {
-    for (int j = 0; j < i; j++) {
-        S[i][j] = S[j][i];
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < i; j++) {
+            S[i][j] = S[j][i];
+        }
     }
-}
 
 
 
@@ -379,9 +383,9 @@ for (int i = 0; i < N; i++) {
         printf("x[%d] = %.15f\n", i, x[i]);
     }
    
-    for (int i = 0; i < N; i++)
+    for (int i = 0; i < M; i++) //alpha v S -> N bodov, u v M
     {
-        for (int j = 0; j < N; j++)
+        for (int j = 0; j < M; j++)
         {
             double dx = coordinatesX[i][0] - coordinatesS[j][0];
             double dy = coordinatesX[i][1] - coordinatesS[j][1];
@@ -395,14 +399,24 @@ for (int i = 0; i < N; i++) {
             }
         }
     }
-
+    
     // overenie hodnot u
     for (int i = 0; i < 5; i++)
     {
         printf("u[%d] = %.10f\n", i, u[i]);
     }
 
+    FILE *output_file= fopen("output_dat.dat","w");
+    if (output_file == NULL)
+    {
+        printf("nepodarilo sa načítať");
+        return 1;
+    }
    
+    for (int i = 0; i < M; i++)
+    {
+        fprintf(output_file,"%.3f %.3f %.3f", B_source[i], L_source[i], u[i] );
+    }
     for (int i = 0; i < N; i++)
     {
         free(S[i]);
