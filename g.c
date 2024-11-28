@@ -27,7 +27,7 @@ void loadSourceData(const char *filename, double *B, double *L, double *H, doubl
         printf("Unable to open file\n");
         exit(1);
     }
-    for (int i = 0; i < M; i++) // Povedzme M je počet zdrojových bodov
+    for (int i = 0; i < N; i++) // Povedzme M je počet zdrojových bodov
     {
         fscanf(file, "%lf %lf %lf %lf %lf", &B[i], &L[i], &H[i], &dg[i], &f[i]);
     }
@@ -43,7 +43,7 @@ void loadMeasurementData(const char *filename, double *B, double *L, double *H, 
         printf("Unable to open file\n");
         exit(1);
     }
-    for (int i = 0; i < N; i++) // Povedzme N je počet bodov merania
+    for (int i = 0; i < M; i++) // Povedzme N je počet bodov merania
     {
         fscanf(file, "%lf %lf %lf %lf %lf", &B[i], &L[i], &H[i], &dg[i], &f[i]);
     }

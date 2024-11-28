@@ -12,6 +12,9 @@
 #define TOL 0.00000000000001
 #define KONST 1000000.0
 
+#define RE 6378137.0
+#define E2 0.00669437999014
+
 // prevod jednotiek
 double rad(double degrees)
 {
@@ -35,7 +38,7 @@ void loadSourceData(const char *filename, double *B, double *L, double *H, doubl
 }
 
 // načítanie bodov merania pre Xi (zo súboru BL-8102.dat) //tieto budu vzdy tie mensie
-void loadMeasurementData(const char *filename, double *B, double *L, double *H, double *dg, double *f)
+void loadMeasurementData(const char *filename, double *B, double *L, double *RR, double *Tzz)
 {
    FILE *file = fopen(filename, "r");
    if (file == NULL)
@@ -45,7 +48,7 @@ void loadMeasurementData(const char *filename, double *B, double *L, double *H, 
    }
    for (int i = 0; i < M; i++) // Povedzme N je počet bodov merania
    {
-       fscanf(file, "%lf %lf %lf %lf %lf", &B[i], &L[i], &H[i], &dg[i], &f[i]);
+       fscanf(file, "%lf %lf %lf %lf %lf", &B[i], &L[i], &RR[i], &Tzz[i]);
    }
    fclose(file);
 }
@@ -98,9 +101,9 @@ int main()
 
    double *B_measurement = (double *)malloc(M * sizeof(double));
    double *L_measurement = (double *)malloc(M * sizeof(double));
-   double *H_measurement = (double *)malloc(M * sizeof(double));
-   double *dg_measurement = (double *)malloc(M * sizeof(double));
-   double *f_measurement = (double *)malloc(M * sizeof(double));
+   double *RR = (double *)malloc(M * sizeof(double));
+   double *Tzz = (double *)malloc(M * sizeof(double));
+   //double *f_measurement = (double *)malloc(M * sizeof(double));
    double *u = calloc(M, sizeof(double));
 
 //   omp_set_num_threads(16); //pôjde to na 4 jadrach
@@ -128,7 +131,7 @@ int main()
 }*/
 
    loadSourceData("BL-8102.dat", B_source, L_source, H_source, dg_source, f_source);
-   loadMeasurementData("BL-160002.dat", B_measurement, L_measurement, H_measurement, dg_measurement, f_measurement);
+   loadMeasurementData("BLRTzz-160002-GOCE-filtered.dat", B_measurement, L_measurement, RR, Tzz);
    printf("Data loaded successfully.\n");
 
    // Nacitanie potrebnych dat
@@ -139,18 +142,18 @@ int main()
    }
 
        double BSrad, LSrad, BXrad, LXrad;
-
+    n = RE / sqrt(1 - E2 * pow(sin(Brad), 2));
 
    // koordinaty
-  /* for (int i = 0; i < N; i++)
+   /* for (int i = 0; i < N; i++)
     {
        BSrad = rad(B_source[i]);
        LSrad = rad(L_source[i]);
 
        // S coordinates
-       coordinatesS[i][0] = R * cos(BSrad) * cos(LSrad); // X
-       coordinatesS[i][1] = R * cos(BSrad) * sin(LSrad); // Y
-       coordinatesS[i][2] = R * sin(BSrad);              // Z
+       coordinatesS[i][0] = (n + H[i]) * cos(BSrad) * cos(LSrad); // X
+       coordinatesS[i][1] = (n + H[i]) * cos(BSrad) * sin(LSrad); // Y
+       coordinatesS[i][2] = (n + H[i]) * sin(BSrad);              // Z
 
     }
 
@@ -168,36 +171,37 @@ int main()
        coordinatesE[i][0] = cos(BXrad) * cos(LXrad); // X
        coordinatesE[i][1] = cos(BXrad) * sin(LXrad); // Y
        coordinatesE[i][2] = sin(BXrad);              // Z
-   }
-   */
-    // source points koordinaty
-   for (int i = 0; i < N; i++)
-     {
-          double BSrad = rad(B_sourcce[i]);
-          double LSrad = rad(L_source[i]);
-          double n;
-          n = RE / sqrt(1 - E2 * pow(sin(Brad), 2));
+   } */
+    for (int i = 0; i < N; i++)
+        {
+            double BSrad = rad(B_sourcce[i]);
+            double LSrad = rad(L_source[i]);
+            double n;
+            n = RE / sqrt(1 - E2 * pow(sin(Brad), 2));
 
-          // S coordinates
-          coordinatesS[i][0] = (n + H_source[i]) * cos(BSrad) * cos(LSrad); // X
-          coordinatesS[i][1] = (n + H_source[i]) * cos(BSrad) * sin(LSrad); // Y
-          coordinatesS[i][2] = (n + H_source[i]) * sin(BSrad);             // Z
-     }
+            // S coordinates
+            coordinatesS[i][0] = (n + H_source[i]) * cos(BSrad) * cos(LSrad); // X
+            coordinatesS[i][1] = (n + H_source[i]) * cos(BSrad) * sin(LSrad); // Y
+            coordinatesS[i][2] = (n + H_source[i]) * sin(BSrad);             // Z
+        }
 
     // measurement points koordinaty
     for (int i = 0; i < M; i++)
-     {
-          double BMrad = rad(B_measurement[i]);
-          double LMrad = rad(L_measurement[i]);
-          double n;
-          n = RE / sqrt(1 - E2 * pow(sin(Brad), 2));
+        {
+            double BXrad = rad(B_measurement[i]);
+            double LXrad = rad(L_measurement[i]);
 
-          // X coordinates
-          coordinatesS[i][0] = RR * cos(Brad) * cos(Lrad); // X
-          coordinatesS[i][1] = RR * cos(Brad) * sin(Lrad); // Y
-          coordinatesS[i][2] = RR * sin(Brad);             // Z
-     }
+            // X coordinates
+            coordinatesS[i][0] = RR * cos(BXrad) * cos(LXrad); // X
+            coordinatesS[i][1] = RR * cos(BXrad) * sin(LXrad); // Y
+            coordinatesS[i][2] = RR * sin(BXrad);             // Z
 
+            // E coordinates
+
+        coordinatesE[i][0] = cos(BXrad) * cos(LXrad); // X
+        coordinatesE[i][1] = cos(BXrad) * sin(LXrad); // Y
+        coordinatesE[i][2] = sin(BXrad);         
+        }
    
    printf("Prešli koordinaty, Continue...\n");
 
@@ -302,10 +306,11 @@ int main()
    // A*x=b
    for (int i = 0; i < N; i++)
    {
-       // b[i] = dGM;             // do b vlozim hodnoty dGM, prava strana //resp AT*dgM(vektor velkosti M)
+       b[i] = - Tzz[i] * 0.0000000000001;             // do b vlozim hodnoty dGM, prava strana //resp AT*dgM(vektor velkosti M)
        x[i] = 0.0;                 // Initial guess x(0) = 0
-       r[i] = r_hat[i] = at_dg[i]; // r = r s vlnkou
+       r[i] = r_hat[i] = b[i]; // r = r s vlnkou
        // PS bude teraz AT*dg
+       //Tzz - 4. stlpec z noveho suboru bude prava strana
    }
 
    double alpha = 1.0, omega = 1.0, rho_new, beta, rho_old = dot_product(r_hat, r);
@@ -361,6 +366,7 @@ int main()
 
        // je norma prilis mala?
        double norm_s = sqrt(dot_product(s, s));
+       printf("%d iteracia \t%.15lf\n",iter,norm_s);
        if (norm_s < TOL)
        {
            for (int j = 0; j < N; j++)
@@ -486,9 +492,9 @@ int main()
    free(B_measurement);
    free(dGMarray_measurement);
    free(L_measurement);
-   free(H_measurement);
-   free(dg_measurement);
-   free(f_source);
+   free(RR);
+   free(Tzz);
+   //free(f_source);
    free(dg_source);
    free(f_measurement);
    free(b);
