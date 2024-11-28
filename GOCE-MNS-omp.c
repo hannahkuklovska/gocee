@@ -142,7 +142,7 @@ int main()
 
 
    // koordinaty
-   for (int i = 0; i < N; i++)
+  /* for (int i = 0; i < N; i++)
     {
        BSrad = rad(B_source[i]);
        LSrad = rad(L_source[i]);
@@ -169,6 +169,34 @@ int main()
        coordinatesE[i][1] = cos(BXrad) * sin(LXrad); // Y
        coordinatesE[i][2] = sin(BXrad);              // Z
    }
+   */
+    // source points koordinaty
+   for (int i = 0; i < N; i++)
+     {
+          double BSrad = rad(B_sourcce[i]);
+          double LSrad = rad(L_source[i]);
+          double n;
+          n = RE / sqrt(1 - E2 * pow(sin(Brad), 2));
+
+          // S coordinates
+          coordinatesS[i][0] = (n + H_source[i]) * cos(BSrad) * cos(LSrad); // X
+          coordinatesS[i][1] = (n + H_source[i]) * cos(BSrad) * sin(LSrad); // Y
+          coordinatesS[i][2] = (n + H_source[i]) * sin(BSrad);             // Z
+     }
+
+    // measurement points koordinaty
+    for (int i = 0; i < M; i++)
+     {
+          double BMrad = rad(B_measurement[i]);
+          double LMrad = rad(L_measurement[i]);
+          double n;
+          n = RE / sqrt(1 - E2 * pow(sin(Brad), 2));
+
+          // X coordinates
+          coordinatesS[i][0] = RR * cos(Brad) * cos(Lrad); // X
+          coordinatesS[i][1] = RR * cos(Brad) * sin(Lrad); // Y
+          coordinatesS[i][2] = RR * sin(Brad);             // Z
+     }
 
    
    printf("Prešli koordinaty, Continue...\n");
