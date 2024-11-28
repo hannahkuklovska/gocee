@@ -430,7 +430,18 @@ int main()
    {
        printf("x[%d] = %.15f\n", i, x[i]);
    }
+    for(int i = 0; i < M; i++)
+    {
+        double BXrad = rad(B_measurement[i]);
+        double LXrad = rad(L_measurement[i]);
+        double n = RE / sqrt(1 - E2 * pow(sin(Brad), 2));
+        // X coordinates
+        coordinatesX[i][0] = (n + alt) * cos(BXrad) * cos(LXrad); // X
+        coordinatesX[i][1] = (n + alt) * cos(BXrad) * sin(LXrad); // Y
+        coordinatesX[i][2] = (n + alt) * sin(BXrad);              // Z
+        
 
+    }
     double G_ij;
 
     #pragma omp parallel for private (dx, dy, dz, rij, G_ij)
@@ -457,21 +468,29 @@ int main()
    {
        printf("u[%d] = %.10f\n", i, u[i]);
    }
-
-    FILE *output_file = fopen("output-MNS.dat", "w");
-    if (output_file == NULL)
+    FILE *out1 = fopen("outBLx.dat", "w");
+    FILE *out2 = fopen("outBLu.dat", "w");
+    if (out1 == NULL)
     {
          printf("nepodarilo sa otvorit\n");
          return 1;
     }
-
+    if (out2 == NULL)
+    {
+         printf("nepodarilo sa otvorit\n");
+         return 1;
+    }
+    for (int i = 0; i < N; i++)
+    {
+         fprintf(out1, "%.2f %.5f %.3f\n", B_source[i], L_source[i], x[i]);
+    }
     for (int i = 0; i < M; i++)
     {
-         fprintf(output_file, "%.2f %.5f %.3f\n", B_measurement[i], L_measurement[i], u[i]);
+         fprintf(out2, "%.2f %.5f %.3f\n", B_measurement[i], L_measurement[i], u[i]);
     }
 
-    fclose(output_file);
-
+    fclose(out1);
+    fclose(out2);
  
    for (int i = 0; i < N; i++)
    {
