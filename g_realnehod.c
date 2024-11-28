@@ -149,9 +149,9 @@ int main()
           coordinatesX[i][2] = RR[i] * sin(B2rad);              // Z
 
           // E coordinates
-          coordinatesE[i][0] = cos(Brad) * cos(Lrad); // X
-          coordinatesE[i][1] = cos(Brad) * sin(Lrad); // Y
-          coordinatesE[i][2] = sin(Brad);             // Z
+          coordinatesE[i][0] = cos(B2rad) * cos(L2rad); // X
+          coordinatesE[i][1] = cos(B2rad) * sin(L2rad); // Y
+          coordinatesE[i][2] = sin(B2rad);              // Z
      }
 
      // MATICA A
