@@ -10,7 +10,7 @@
 //q - posledny stlpec suboru bude prava strana
 #define N 3602 // pocet zdrojovych bodov
 #define M 8102 // pocet meracich bodov
-#define TOL 1e-7
+#define TOL 1e-15
 
 // prevod jednotiek
 double rad(double degrees)
@@ -46,6 +46,21 @@ void loadMeasurementData(const char *filename, double *B, double *L, double *H, 
     for (int i = 0; i < N; i++) // Povedzme N je počet bodov merania
     {
         fscanf(file, "%lf %lf %lf %lf %lf", &B[i], &L[i], &H[i], &dg[i], &f[i]);
+    }
+    fclose(file);
+}
+
+void loadDataAlt(const char *filename, double *Alt)
+{
+    FILE *file = fopen(filename, "r");
+    if (file == NULL)
+    {
+        printf("Unable to open file\n");
+        exit(1);
+    }
+    for (int i = 0; i < M; i++) // Povedzme M je počet zdrojových bodov
+    {
+        fscanf(file, "%lf", &Alt[i]);
     }
     fclose(file);
 }
@@ -127,6 +142,7 @@ int main()
 
     loadSourceData("/Users/ninalackovicova/Downloads/BL-8102.dat", B_source, L_source, H_source, dg_source, f_source);
     loadMeasurementData("/Users/ninalackovicova/Downloads/BL-3602.dat", B_measurement, L_measurement, H_measurement, dg_measurement, f_measurement);
+    loadData("/Users/ninalackovicova/Downloads/BL-3602.dat", Alt);  // nacitanie realnych vysok zo suboru ( este nemame )
     printf("Data loaded successfully.\n");
 
     // Nacitanie potrebnych dat
