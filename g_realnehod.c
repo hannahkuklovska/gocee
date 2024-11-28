@@ -202,7 +202,7 @@ int main()
      for (int i = 0; i < N; i++)
      {
           // poseldny stplec druheho suboru, opravit
-          b[i] = -f[i] * 0.000000001; // do b vlozim realne hodnoty z vektora dg
+          b[i] = -Tzz[i] * 0.000000001; // do b vlozim realne hodnoty z vektora dg
           x[i] = 0.0;                 // Initial guess x(0) = 0
           r[i] = r_hat[i] = b[i];     // r = r s vlnkou
      }
