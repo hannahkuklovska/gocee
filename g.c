@@ -419,7 +419,7 @@ int main()
    
     for (int i = 0; i < M; i++)
     {
-        fprintf(output_file,"%.3f %.3f %.3f", B_source[i], L_source[i], u[i] );
+        fprintf(output_file,"%.3f %.3f %.3f %.3f", B_source[i], L_source[i], u[i], x[i] );
     }
     for (int i = 0; i < N; i++)
     {
