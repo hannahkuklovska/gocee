@@ -3,7 +3,7 @@
 #include <math.h>
 #include <omp.h>
 
-#define N 8102 // pocet bodov
+#define N 1600002 // pocet bodov
 #define TOL 1e-9
 #define RE 6378137.0
 #define E2 0.00669437999014
@@ -32,7 +32,7 @@ void loadData(const char *filename, double *B, double *L, double *H, double *dg,
      fclose(file);
 }
 
-void loadDataAlt(const char *filename, double *Alt)
+void loadData2(const char *filename, double *B2, double *L2, double *RR, double *Tzz)
 {
      FILE *file = fopen(filename, "r");
      if (file == NULL)
@@ -42,7 +42,7 @@ void loadDataAlt(const char *filename, double *Alt)
      }
      for (int i = 0; i < N; i++)
      {
-          fscanf(file, "%lf", &Alt[i]);
+          fscanf(file, "%lf %lf %lf %lf %lf", &B2[i], &L2[i], &RR[i], &Tzz[i]);
      }
      fclose(file);
 }
@@ -91,7 +91,10 @@ int main()
      double *H = (double *)malloc(N * sizeof(double));
      double *dg = (double *)malloc(N * sizeof(double));
      double *f = (double *)malloc(N * sizeof(double));
-     double *Alt = (double *)malloc(N * sizeof(double));
+     double *B2 = (double *)malloc(N * sizeof(double));
+     double *L2 = (double *)malloc(N * sizeof(double));
+     double *RR = (double *)malloc(N * sizeof(double));
+     double *Tzz = (double *)malloc(N * sizeof(double));
 
      // MaticA A
      double **A = (double **)malloc(N * sizeof(double *));
@@ -105,9 +108,10 @@ int main()
           return 1;
      }
 
-     loadData("/Users/hannah/Desktop/GGGGG/gocee/BL-8102.dat", B, L, H, dg, f);
+     loadData("/", B, L, H, dg, f);
+     loadData2("/", B2, L2, RR, Tzz);
 
-     loadDataAlt("/Users/hannah/Desktop/GGGGG/gocee/BL-8102.dat", Alt);
+     // loadDataAlt("/Users/hannah/Desktop/GGGGG/gocee/BL-8102.dat", Alt);
 
      /* //
      for (int i = 0; i < 5; i++)
@@ -129,6 +133,8 @@ int main()
      {
           double Brad = rad(B[i]);
           double Lrad = rad(L[i]);
+          double B2rad = rad(B2[i]);
+          double L2rad = rad(L2[i]);
           double n;
           n = RE / sqrt(1 - E2 * pow(sin(Brad), 2));
 
@@ -138,9 +144,9 @@ int main()
           coordinatesS[i][2] = (n + H[i]) * sin(Brad);             // Z
 
           // X coordinates
-          coordinatesX[i][0] = (n + alt) * cos(Brad) * cos(Lrad); // X
-          coordinatesX[i][1] = (n + alt) * cos(Brad) * sin(Lrad); // Y
-          coordinatesX[i][2] = (n + alt) * sin(Brad);             // Z
+          coordinatesX[i][0] = RR[i] * cos(B2rad) * cos(L2rad); // X
+          coordinatesX[i][1] = RR[i] * cos(B2rad) * sin(L2rad); // Y
+          coordinatesX[i][2] = RR[i] * sin(B2rad);              // Z
 
           // E coordinates
           coordinatesE[i][0] = cos(Brad) * cos(Lrad); // X
@@ -195,9 +201,10 @@ int main()
 
      for (int i = 0; i < N; i++)
      {
-          b[i] = f[i] * 0.000000001; // do b vlozim realne hodnoty z vektora dg
-          x[i] = 0.0;                // Initial guess x(0) = 0
-          r[i] = r_hat[i] = b[i];    // r = r s vlnkou
+          // poseldny stplec druheho suboru, opravit
+          b[i] = -f[i] * 0.000000001; // do b vlozim realne hodnoty z vektora dg
+          x[i] = 0.0;                 // Initial guess x(0) = 0
+          r[i] = r_hat[i] = b[i];     // r = r s vlnkou
      }
 
      double alpha = 1.0, omega = 1.0, rho_new, beta, rho_old = dot_product(r_hat, r);
